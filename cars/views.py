@@ -1,3 +1,4 @@
+from doctest import REPORT_NDIFF
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -21,7 +22,8 @@ def cars_list(request):
         return Response(serializers.data, status=status.HTTP_201_CREATED)
 
 
-@api_view(['GET', 'PUT'])
+
+@api_view(['GET', 'PUT', 'DELETE'])
 def car_detail(request, pk):
     car = get_object_or_404(Car, pk=pk)
     if request.method == 'GET':
@@ -32,3 +34,6 @@ def car_detail(request, pk):
         serializers.is_valid(raise_exception=True)
         serializers.save()
         return Response(serializers.data)
+    elif request.method == 'DELETE':
+        car.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
