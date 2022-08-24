@@ -1,11 +1,23 @@
-from doctest import REPORT_NDIFF
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from cars import serializers
 from cars.models import Car
 from cars.serializers import CarSerializer
 # decorator is going to assign certain permission to the function below
+
+
+@api_view(['GET'])
+def query_param(request):
+    dealership_name = request.query_params.get('dealership')
+    queryset = Car.objects.all()
+    if dealership_name:
+        queryset = queryset.filter(dealership__name=dealership_name)
+    
+    serializer = CarSerializer(queryset, many=True)
+    print(serializer)
+    return Response(serializer.data)
 
 
 @api_view(['GET', 'POST'])
@@ -20,7 +32,6 @@ def cars_list(request):
         serializers.is_valid(raise_exception=True)
         serializers.save()
         return Response(serializers.data, status=status.HTTP_201_CREATED)
-
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
